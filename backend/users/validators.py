@@ -4,4 +4,4 @@ from .models import User
 
 
 
-unique_email_validator = UniqueValidator(queryset=User.objects.all(), lookup='exact')
+unique_email_validator = UniqueValidator(queryset=User.objects.all(), lookup='iexact')

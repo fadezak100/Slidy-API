@@ -1,16 +1,14 @@
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
+from rest_framework.authtoken.serializers import AuthTokenSerializer
+from django.contrib.auth import login
+from knox.models import AuthToken
+from knox.views import LoginView as KnoxLoginView
+
 from users.serializers import RegisterSerializer
 from users.serializers import UserSerializer as RegisteredUserSerializer
-from django.contrib.auth import login
-import json
-from knox.models import AuthToken
-from rest_framework.authtoken.serializers import AuthTokenSerializer
-
-from django.contrib.auth import authenticate
 from users.models import User
-from knox.views import LoginView as KnoxLoginView
 
 class RegisterUserAPIView(generics.GenericAPIView):
     permission_classes = (AllowAny,)

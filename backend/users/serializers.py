@@ -2,14 +2,12 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 
-from django.contrib.auth import authenticate
-
-
 from .models import User
-validate_email = UniqueValidator(User.objects.all())
+from .validators import unique_email_validator
+
 
 class UserSerializer(serializers.ModelSerializer): 
-    email = serializers.EmailField(validators=[validate_email])
+    email = serializers.EmailField(validators=[unique_email_validator])
     first_name = serializers.CharField(max_length=20, required=True)
     last_name = serializers.CharField(max_length=20, required=True)
     avatar = serializers.URLField(required=False)
