@@ -46,19 +46,12 @@ class LogInAPIView(KnoxLoginView):
 
     def get_post_response_data(self, request, token, instance):
         UserSerializer = self.get_user_serializer_class()
-        userData = User.objects.filter(username=request.user).values()
-        query_set = User.objects.filter(username=request.user).values()[0]
-   
-        response = {
-            "id": query_set['id'],
-            "username": query_set['username'],
-            "first_name": query_set['first_name'],
-            "last_name": query_set['last_name'],
-            "avatar": query_set['avatar']
-        }
+
+        query_set = User.objects.filter(username=request.user).values('id','username','first_name','last_name', 'email', 'avatar')[0]
+        user_data = RegisteredUserSerializer(query_set).data
 
         data = {
-            'users': json.dumps(response),
+            'users': user_data,
             'expiry': self.format_expiry_datetime(instance.expiry),
             'token': token
         }

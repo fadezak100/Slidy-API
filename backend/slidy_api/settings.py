@@ -141,7 +141,4 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticatedOrReadOnly"
    ]
 }
-REST_KNOX = {
-  'USER_SERIALIZER': 'knox.serializers.UserSerializer',
-}
     
