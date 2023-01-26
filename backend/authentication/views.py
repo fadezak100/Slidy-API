@@ -1,0 +1,75 @@
+from rest_framework import generics
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from users.serializers import RegisterSerializer
+from users.serializers import UserSerializer as RegisteredUserSerializer
+from django.contrib.auth import login
+import json
+from knox.models import AuthToken
+from rest_framework.authtoken.serializers import AuthTokenSerializer
+
+from django.contrib.auth import authenticate
+from users.models import User
+from knox.views import LoginView as KnoxLoginView
+
+class RegisterUserAPIView(generics.GenericAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = RegisterSerializer
+
+    def post(self, request, *args, **kwargs): 
+        serializer = self.get_serializer(data=request.data)   
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+    
+        return Response ({
+            "status": 200,
+            "message": 'success',
+            "data": {
+                "user": RegisteredUserSerializer(user).data,
+                "token": AuthToken.objects.create(user)[1],
+            }
+        })
+
+
+
+class LogInAPIView(KnoxLoginView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = AuthTokenSerializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        login(request, user)
+        return super(LogInAPIView, self).post(request, format=None)
+
+
+    def get_post_response_data(self, request, token, instance):
+        UserSerializer = self.get_user_serializer_class()
+        userData = User.objects.filter(username=request.user).values()
+        query_set = User.objects.filter(username=request.user).values()[0]
+   
+        response = {
+            "id": query_set['id'],
+            "username": query_set['username'],
+            "first_name": query_set['first_name'],
+            "last_name": query_set['last_name'],
+            "avatar": query_set['avatar']
+        }
+
+        data = {
+            'users': json.dumps(response),
+            'expiry': self.format_expiry_datetime(instance.expiry),
+            'token': token
+        }
+        if UserSerializer is not None:
+            data["user"] = UserSerializer(
+                request.user,
+                context=self.get_context()
+            ).data
+        return data
+
+
+
+register_generic_view = RegisterUserAPIView.as_view()
+login_generic_view = LogInAPIView.as_view()

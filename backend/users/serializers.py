@@ -1,21 +1,57 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
+from django.contrib.auth.password_validation import validate_password
+
+from django.contrib.auth import authenticate
+
+
 from .models import User
+validate_email = UniqueValidator(User.objects.all())
 
+class UserSerializer(serializers.ModelSerializer): 
+    email = serializers.EmailField(validators=[validate_email])
+    first_name = serializers.CharField(max_length=20, required=True)
+    last_name = serializers.CharField(max_length=20, required=True)
+    avatar = serializers.URLField(required=False)
 
-class UserSerializer(serializers.ModelSerializer):
-    full_name = serializers.SerializerMethodField(read_only=True)
-    
     class Meta:
         model = User
         fields = (
             "id",
-            "full_name",
             "first_name",
             "last_name",
             "avatar",
             "email",
-
         )
+    
+class UserResponse(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'id', 'avatar')
 
-    def get_full_name(self, obj):
-        return f"{obj.first_name} {obj.last_name}"
+class RegisterSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=True, validators=[validate_email])
+    password = serializers.CharField(
+        write_only=True, required=True, validators=[validate_password])
+    
+    class Meta:
+        model = User
+        fields = ('username', 'password',
+            'email', 'first_name', 'last_name')
+
+        extra_kwargs = {
+        'first_name': {'required': True},
+        'last_name': {'required': True}
+        }
+
+    def create(self, validated_data):
+        user = User.objects.create(
+        username=validated_data['username'],
+        email=validated_data['email'],
+        first_name=validated_data['first_name'],
+        last_name=validated_data['last_name'],
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+
+        return user

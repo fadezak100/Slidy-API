@@ -6,6 +6,7 @@ User = settings.AUTH_USER_MODEL
 class Slide(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     title = models.CharField(max_length=200)
+    description = models.TimeField(null=True, blank=True)
     url = models.URLField()
     public = models.BooleanField(default=True)
     live = models.BooleanField(default=False)
