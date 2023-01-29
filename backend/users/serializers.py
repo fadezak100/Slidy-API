@@ -4,7 +4,7 @@ from django.contrib.auth.password_validation import validate_password
 
 from .models import User
 from .validators import unique_email_validator
-
+from .components import UserCommonComponents
 
 class UserSerializer(serializers.ModelSerializer): 
     email = serializers.EmailField(validators=[unique_email_validator])
@@ -43,13 +43,4 @@ class RegisterSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        user = User.objects.create(
-        username=validated_data['username'],
-        email=validated_data['email'],
-        first_name=validated_data['first_name'],
-        last_name=validated_data['last_name'],
-        )
-        user.set_password(validated_data['password'])
-        user.save()
-
-        return user
+        return UserCommonComponents.createUse(validated_data=validated_data)
