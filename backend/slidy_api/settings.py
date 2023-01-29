@@ -139,4 +139,6 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticatedOrReadOnly"
    ]
 }
+
+DEFAULT_AVATAR = os.environ.get('DEFAULT_AVATAR')
     
