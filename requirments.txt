@@ -3,3 +3,4 @@ django-dotenv
 djangorestframework
 django-cors-headers
 django-rest-knox
+PyYAML
