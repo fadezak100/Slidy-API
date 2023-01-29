@@ -28,7 +28,7 @@ class UserResponse(serializers.ModelSerializer):
         fields = ('username', 'id', 'avatar')
 
 class RegisterSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(required=True, validators=[validate_email])
+    email = serializers.EmailField(required=True, validators=[unique_email_validator])
     password = serializers.CharField(
         write_only=True, required=True, validators=[validate_password])
     
