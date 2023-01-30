@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     # Internal Apps
     'users',
     'slides',
-    'authentication',
     # Third Party Packages
     'rest_framework',
     'rest_framework.authtoken',
@@ -134,10 +133,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
    "DEFAULT_AUTHENTICATION_CLASSES": [
         "knox.auth.TokenAuthentication",
-        "authentication.authentication.TokenAuthentication",
+        "users.authentication.TokenAuthentication",
    ],
    "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticatedOrReadOnly"
    ]
 }
+
+DEFAULT_AVATAR = os.environ.get('DEFAULT_AVATAR')
     
