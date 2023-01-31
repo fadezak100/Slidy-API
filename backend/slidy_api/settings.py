@@ -155,7 +155,3 @@ cloudinary.config(
     api_key = os.environ.get('CLOUDINARY_API_KEY'),
     api_secret = os.environ.get('CLOUDINARY_API_SECRET')
 )
-
-TEST_TOKEN_VALUE = os.environ.get('TEST_TOKEN')
-
-TEST_TOKEN = f'Token {TEST_TOKEN_VALUE}'
