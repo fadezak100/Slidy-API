@@ -146,10 +146,6 @@ REST_FRAMEWORK = {
 
 DEFAULT_AVATAR = os.environ.get('DEFAULT_AVATAR')
 
-MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'assets')
-
-MEDIA_URL = '/media/'
-
 cloudinary.config(
     cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'),
     api_key = os.environ.get('CLOUDINARY_API_KEY'),
