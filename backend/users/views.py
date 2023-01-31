@@ -2,7 +2,7 @@ from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
 
 from rest_framework import viewsets, permissions, generics
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from django.contrib.auth import login
@@ -10,11 +10,17 @@ from django.contrib.auth import login
 from .mixins import StaffEditorPermissionMixin
 from .models import User
 from .serializers import UserSerializer, RegisterSerializer
+from users.serializers import UserSerializer
+
+from knox.auth import TokenAuthentication
+
 
 class UserViewSet(StaffEditorPermissionMixin, viewsets.ModelViewSet):
-    permission_class = [permissions.IsAuthenticated]
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 class RegisterUserAPIView(generics.GenericAPIView):
     permission_classes = (AllowAny, )
@@ -33,13 +39,13 @@ class RegisterUserAPIView(generics.GenericAPIView):
                 "token": AuthToken.objects.create(user)[1]
             }
         })
+        difficulties
 
 class LogInAPIView(KnoxLoginView):
     permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
         serializer = AuthTokenSerializer(data=request.data)
-
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         login(request, user)

@@ -1,13 +1,13 @@
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 
 from .models import User
-from .validators import unique_email_validator
+from .validators import unique_attribute_validator
 from .components import UserCommonComponents
 
 class UserSerializer(serializers.ModelSerializer): 
-    email = serializers.EmailField(validators=[unique_email_validator])
+    email = serializers.EmailField(validators=[unique_attribute_validator])
+    username = serializers.CharField(max_length=50, required=True, validators=[unique_attribute_validator])
     first_name = serializers.CharField(max_length=20, required=True)
     last_name = serializers.CharField(max_length=20, required=True)
     avatar = serializers.URLField(required=False)
@@ -16,6 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             "id",
+            "username",
             "first_name",
             "last_name",
             "avatar",
@@ -28,7 +29,7 @@ class UserResponse(serializers.ModelSerializer):
         fields = ('username', 'id', 'avatar')
 
 class RegisterSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(required=True, validators=[unique_email_validator])
+    email = serializers.EmailField(required=True, validators=[unique_attribute_validator])
     password = serializers.CharField(
         write_only=True, required=True, validators=[validate_password])
     
@@ -43,4 +44,4 @@ class RegisterSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        return UserCommonComponents.createUse(validated_data=validated_data)
+        return UserCommonComponents.createUse(first_name=validated_data['first_name'], last_name=validated_data['last_name'], email=validated_data['email'], password=validated_data['password'], username=validated_data['username'])
