@@ -11,13 +11,15 @@ from .mixins import StaffEditorPermissionMixin
 from .models import User
 from .serializers import UserSerializer, RegisterSerializer
 
+
 class UserViewSet(StaffEditorPermissionMixin, viewsets.ModelViewSet):
     permission_class = [permissions.IsAuthenticated]
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+
 class RegisterUserAPIView(generics.GenericAPIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
 
     def post(self, request, *args, **kwargs):
@@ -34,6 +36,7 @@ class RegisterUserAPIView(generics.GenericAPIView):
             }
         })
 
+
 class LogInAPIView(KnoxLoginView):
     permission_classes = (AllowAny,)
 
@@ -42,13 +45,15 @@ class LogInAPIView(KnoxLoginView):
 
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
-        login(request, user)
+        request.user = user
         return super(LogInAPIView, self).post(request, format=None)
 
     def get_post_response_data(self, request, token, instance):
         serializer = self.get_user_serializer_class()
 
-        query_set = User.objects.filter(username=request.user).values('id','username','first_name','last_name', 'email', 'avatar')[0]
+        query_set = \
+        User.objects.filter(username=request.user).values('id', 'username', 'first_name', 'last_name', 'email',
+                                                          'avatar')[0]
         user_data = UserSerializer(query_set).data
 
         data = {
