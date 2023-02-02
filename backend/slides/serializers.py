@@ -32,7 +32,6 @@ class SlideSerializer(serializers.ModelSerializer):
             'is_live',
             'slide',
         )
-        depth = 2
 
     def get_user_data(self, obj):
         return UserSlideInlineSerializer(obj.user).data
