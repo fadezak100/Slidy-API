@@ -1,9 +1,16 @@
 from rest_framework import serializers
+
 from django.contrib.auth.password_validation import validate_password
 
 from .models import User
 from .validators import unique_attribute_validator
 from .components import UserCommonComponents
+
+class InlineSlidesSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    title = serializers.CharField(max_length=40)
+    description = serializers.CharField(max_length=1000)
+    url = serializers.URLField()
 
 class UserSerializer(serializers.ModelSerializer): 
     email = serializers.EmailField(validators=[unique_attribute_validator])
@@ -22,6 +29,16 @@ class UserSerializer(serializers.ModelSerializer):
             "avatar",
             "email",
         )
+
+class UserWithSlidesSerializer(UserSerializer):
+    slides_data = serializers.SerializerMethodField(source=serializers.PrimaryKeyRelatedField(many=True, read_only=True), read_only=True)
+
+    class Meta(UserSerializer.Meta):
+        fields = UserSerializer.Meta.fields + ('slides_data',)
+
+    def get_slides_data(self, obj):
+        return InlineSlidesSerializer(obj.slides_info, many=True).data
+
     
 class UserResponse(serializers.ModelSerializer):
     class Meta:
@@ -44,4 +61,4 @@ class RegisterSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        return UserCommonComponents.createUse(first_name=validated_data['first_name'], last_name=validated_data['last_name'], email=validated_data['email'], password=validated_data['password'], username=validated_data['username'])
+        return UserCommonComponents.createUser(first_name=validated_data['first_name'], last_name=validated_data['last_name'], email=validated_data['email'], password=validated_data['password'], username=validated_data['username'])

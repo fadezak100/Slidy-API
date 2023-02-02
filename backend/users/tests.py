@@ -16,14 +16,23 @@ class UsersTests(APITestCase):
 
         self.token = f'Token {str(AuthToken.objects.create(user=self.user)[1])}'
 
-    def test_get__users(self):
-        self.client.credentials(HTTP_AUTHORIZATION=self.token)
+    def test_get__users_without_slides(self):
         response = self.client.get(reverse('users-list'))
         result = response.json()
 
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(result, list)
         self.assertEqual(result[0]['first_name'], 'fadi')
+    
+    def test_get__users_with_slides(self):
+        response = self.client.get(reverse('users-list') + '?slides=true')
+        result = response.json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(result, list)
+        self.assertEqual(result[0]['first_name'], 'fadi')
+        self.assertIn('slides_data', result[0])
+        self.assertIsInstance(result[0]['slides_data'], list)
 
     def test_create_user_with_existed_username(self):
         self.client.credentials(HTTP_AUTHORIZATION=self.token)
@@ -43,7 +52,7 @@ class UsersTests(APITestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(result['username'][0], 'This field must be unique.')
 
-    def test_authentication(self):
+    def test_authentication_flow(self):
 
         self.client.post(reverse('sign-up'), data={
                 "username": "ahmedsaleh",
@@ -87,7 +96,96 @@ class UsersTests(APITestCase):
         response = self.client.post(reverse('logout')) 
         self.assertEqual(response.status_code, 204)
 
-        # test that the token is invalid
         self.client.credentials(HTTP_AUTHORIZATION=token_header)
         response = self.client.get(reverse('users-list'))
         self.assertEqual(response.status_code, 401)
+
+    def test_login_with_slides(self):
+        self.client.post(reverse('sign-up'), data={
+                "username": "ahmedsaleh",
+                "password": "Test123456!!",
+                "email": "ahmedsaleh@gmail.com",
+                "first_name": "Ahmed",
+                "last_name": "Saleh"
+        })
+
+        credentials = {
+            "username": "ahmedsaleh",
+            "password": "Test123456!!"
+        }
+        response = self.client.post(reverse('login') + '?slides=true', data=credentials)
+        result = response.json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('slides_data', result['users'])
+        self.assertIsInstance(result['users']['slides_data'], list)
+
+    def test_login_without_slides(self):
+        self.client.post(reverse('sign-up'), data={
+                "username": "ahmedsaleh",
+                "password": "Test123456!!",
+                "email": "ahmedsaleh@gmail.com",
+                "first_name": "Ahmed",
+                "last_name": "Saleh"
+        })
+
+        credentials = {
+            "username": "ahmedsaleh",
+            "password": "Test123456!!"
+        }
+        response = self.client.post(reverse('login'), data=credentials)
+        result = response.json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('slides_data', result['users'])
+
+    def test_update_own_avatar(self):
+        self.client.credentials(HTTP_AUTHORIZATION=self.token)
+
+        data = {
+            "avatar": "https://pbs.twimg.com/profile_banners/1236621082213462016/1674966722/1500x500"
+        }
+
+        response = self.client.put(reverse('users-detail', kwargs={'pk':1}), data=data)
+        result = response.json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(result['data']['avatar'], data['avatar'])
+
+    def test_update_other_avatar(self):
+
+        self.client.post(reverse('sign-up'), data={
+                "username": "ahmedsaleh",
+                "password": "Test123456!!",
+                "email": "ahmedsaleh@gmail.com",
+                "first_name": "Ahmed",
+                "last_name": "Saleh"
+        })
+
+        self.client.credentials(HTTP_AUTHORIZATION=self.token)
+
+        data = {
+            "avatar": "https://pbs.twimg.com/profile_banners/1236621082213462016/1674966722/1500x500"
+        }
+
+        response = self.client.put(reverse('users-detail', kwargs={'pk':2}), data=data)
+        result = response.json()
+        
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(result['detail'], 'You do not have permission to perform this action.')
+
+    def test_create_users_with_no_permission(self):
+
+        data = {
+            "username": "fadezak100",
+            "password": "Password123456!!",
+            "email": "fadezak100w@gmail.com",
+            "first_name": "Micheal",
+            "last_name": "Scott"
+        }
+
+        response = self.client.post(reverse('users-list'), data=data)
+        result = response.json()
+        
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(result['detail'], 'Authentication credentials were not provided.')

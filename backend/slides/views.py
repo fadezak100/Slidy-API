@@ -15,15 +15,20 @@ class SlideViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        request.data.get('slide')
 
         slide_file = request.data.get('slide')
+
+        if not request.data.get('title'):
+            serializer.validated_data['title'] = str(slide_file)
+
         upload_data = cloudinary.uploader.upload(slide_file, resource_type="auto")
         serializer.validated_data['url'] = upload_data.get('url')
         serializer.validated_data['user'] = request.user
 
         self.perform_create(serializer=serializer)
         return Response({
-            "state": 200,
+            "status_code": 200,
             "message": "success",
             "data": serializer.data
         })
