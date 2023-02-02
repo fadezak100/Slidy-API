@@ -5,6 +5,7 @@ from django.conf import settings
 
 class User(AbstractUser):
     email = models.EmailField()
+    username = models.CharField(max_length=50, unique=True)
 
     def get_default_avatar():
         return settings.DEFAULT_AVATAR

@@ -4,3 +4,6 @@ djangorestframework
 django-cors-headers
 django-rest-knox
 PyYAML
+cloudinary
+requests=2.6.0
+uplink
