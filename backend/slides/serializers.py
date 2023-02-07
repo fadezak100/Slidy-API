@@ -1,24 +1,28 @@
+from django.core.validators import FileExtensionValidator
+
 from rest_framework import serializers
 
 from users.models import User
 from .models import Slide
 
-from django.core.validators import FileExtensionValidator
-
 
 class UserSlideInlineSerializer(serializers.Serializer):
     id = serializers.IntegerField()
+    username = serializers.CharField(max_length=50)
     first_name = serializers.CharField(max_length=20)
     last_name = serializers.CharField(max_length=20)
     avatar = serializers.URLField()
     email = serializers.EmailField()
 
+
 class SlideSerializer(serializers.ModelSerializer):
     title = serializers.CharField(allow_null=True)
-    user_data = serializers.SerializerMethodField(read_only=True)
-    slide = serializers.FileField(write_only=True, validators=[FileExtensionValidator(['md'], 'only .md files are allowed')])
+    slide = serializers.FileField(write_only=True, validators=[
+                                  FileExtensionValidator(['md'], 'only .md files are allowed')])
+    description = serializers.CharField(allow_null=True)
     is_public = serializers.BooleanField(default=True)
     is_live = serializers.BooleanField(default=False)
+    user_data = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Slide

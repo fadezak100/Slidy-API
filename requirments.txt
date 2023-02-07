@@ -7,3 +7,4 @@ PyYAML
 cloudinary
 requests=2.6.0
 uplink
+markdown
