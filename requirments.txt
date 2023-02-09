@@ -5,6 +5,10 @@ django-cors-headers
 django-rest-knox
 PyYAML
 cloudinary
-requests=2.6.0
+requests==2.6.0
 uplink
 markdown
+channels==3.0.5
+channels-radis
+psycopg2-binary
+pytest
