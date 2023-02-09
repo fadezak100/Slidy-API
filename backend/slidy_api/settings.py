@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+from configs import environment
 import os
 
 import cloudinary
@@ -23,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = environment.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -33,6 +34,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,6 +44,7 @@ INSTALLED_APPS = [
     # Internal Apps
     'users',
     'slides',
+    'comments',
     # Third Party Packages
     'rest_framework',
     'rest_framework.authtoken',
@@ -49,6 +52,8 @@ INSTALLED_APPS = [
     'cloudinary',
     'requests'
 ]
+
+ASGI_APPLICATION = 'slidy_api.asgi.application'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -78,16 +83,28 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'slidy_api.wsgi.application'
+ASGI_APPLICATION = 'slidy_api.asgi.application'
 
-
+CHANNEL_LAYERS = {
+    'default': {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        'CONFIG': {
+            'hosts': [(environment.REDIS_HOST, environment.REDIS_PORT)],
+        }
+    }
+}
+    
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': environment.DB_NAME,
+        'USER': environment.DB_USER,
+        'PASSWORD': environment.DB_PASSWORD,
+        'HOST': environment.DB_HOST,
+        'PORT': environment.DB_PORT,
     }
 }
 
@@ -145,10 +162,12 @@ REST_FRAMEWORK = {
    ]
 }
 
-DEFAULT_AVATAR = os.environ.get('DEFAULT_AVATAR')
+DEFAULT_AVATAR = environment.DEFAULT_AVATAR
 
 cloudinary.config(
-    cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME'),
-    api_key = os.environ.get('CLOUDINARY_API_KEY'),
-    api_secret = os.environ.get('CLOUDINARY_API_SECRET')
+    cloud_name = environment.CLOUDINARY_NAME,
+    api_key = environment.CLOUDINARY_API_KEY,
+    api_secret = environment.CLOUDINARY_API_SECRET
 )
+
+serve_static = True

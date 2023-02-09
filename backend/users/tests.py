@@ -1,4 +1,5 @@
 from rest_framework.test import APITestCase
+
 from .models import User
 from knox.models import AuthToken
 
@@ -16,7 +17,7 @@ class UsersTests(APITestCase):
 
         self.token = f'Token {str(AuthToken.objects.create(user=self.user)[1])}'
 
-    def test_get__users_without_slides(self):
+    def test_get_users_without_slides(self):
         response = self.client.get(reverse('users-list'))
         result = response.json()
 
@@ -24,7 +25,7 @@ class UsersTests(APITestCase):
         self.assertIsInstance(result, list)
         self.assertEqual(result[0]['first_name'], 'fadi')
 
-    def test_get__users_with_slides(self):
+    def test_get_users_with_slides(self):
         response = self.client.get(reverse('users-list') + '?slides=true')
         result = response.json()
 
@@ -149,7 +150,7 @@ class UsersTests(APITestCase):
         }
 
         response = self.client.put(
-            reverse('users-detail', kwargs={'pk': 1}), data=data)
+            reverse('users-detail', kwargs={'pk': self.user.id}), data=data)
         result = response.json()
 
         self.assertEqual(response.status_code, 200)
@@ -157,13 +158,14 @@ class UsersTests(APITestCase):
 
     def test_update_other_avatar(self):
 
-        self.client.post(reverse('sign-up'), data={
+        new_user_response = self.client.post(reverse('sign-up'), data={
             "username": "ahmedsaleh",
             "password": "Test123456!!",
             "email": "ahmedsaleh@gmail.com",
             "first_name": "Ahmed",
             "last_name": "Saleh"
         })
+        new_user = new_user_response.json()
 
         self.client.credentials(HTTP_AUTHORIZATION=self.token)
 
@@ -172,7 +174,7 @@ class UsersTests(APITestCase):
         }
 
         response = self.client.put(
-            reverse('users-detail', kwargs={'pk': 2}), data=data)
+            reverse('users-detail', kwargs={'pk': new_user['data']['id']}), data=data)
         result = response.json()
 
         self.assertEqual(response.status_code, 403)
