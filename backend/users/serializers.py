@@ -68,4 +68,4 @@ class RegisterSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        return UserCommonComponents.createUser(first_name=validated_data['first_name'], last_name=validated_data['last_name'], email=validated_data['email'], password=validated_data['password'], username=validated_data['username'])
+        return UserCommonComponents.create_user(first_name=validated_data['first_name'], last_name=validated_data['last_name'], email=validated_data['email'], password=validated_data['password'], username=validated_data['username'])

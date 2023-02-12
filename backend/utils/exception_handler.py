@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 
 from rest_framework.views import exception_handler
-from .generic_errors import SlideRequestError, UploadSlidesError
+from .generic_errors import BaseException
 
 
 def custom_exception_handler(exc, context):
@@ -17,16 +17,8 @@ def custom_exception_handler(exc, context):
             "status_code": 500,
         }
 
-        if isinstance(exc, SlideRequestError):
-            response['message'] = str(exc)
-            response['status_code'] = 500
+        if isinstance(exc, BaseException):
+            response['message'] = exc.message
+            response['status_code'] = exc.status
 
-        if isinstance(exc, UploadSlidesError):
-            response['message'] = str(exc)
-            response['status_code'] = 500
-
-        if isinstance(exc, TypeError):
-            response['message'] = str(exc)
-            response['status_code'] = 500
-
-        return Response(response)
+        return Response(response, status=response['status_code'])

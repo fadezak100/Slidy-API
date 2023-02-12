@@ -8,15 +8,17 @@ from django.urls import reverse
 class UsersTests(APITestCase):
 
     def setUp(self):
-        self.user = User.objects.create(username='fadezak100',
-                                        password='Test123456!!',
-                                        email='fadezak100@gmail.com',
-                                        first_name='fadi',
-                                        last_name='zakout')
+        self.user = User.objects.create(
+            username='fadezak100',
+            password='Test123456!!',
+            email='fadezak100@gmail.com',
+            first_name='fadi',
+            last_name='zakout'
+        )
 
         self.token = f'Token {str(AuthToken.objects.create(user=self.user)[1])}'
 
-    def test_get__users_without_slides(self):
+    def test_get_users_without_slides(self):
         response = self.client.get(reverse('users-list'))
         result = response.json()
 
@@ -24,7 +26,7 @@ class UsersTests(APITestCase):
         self.assertIsInstance(result, list)
         self.assertEqual(result[0]['first_name'], 'fadi')
 
-    def test_get__users_with_slides(self):
+    def test_get_users_with_slides(self):
         response = self.client.get(reverse('users-list') + '?slides=true')
         result = response.json()
 
@@ -34,7 +36,7 @@ class UsersTests(APITestCase):
         self.assertIn('slides_data', result[0])
         self.assertIsInstance(result[0]['slides_data'], list)
 
-    def test_create_user_with_existed_username(self):
+    def test_create_user_with_existed_username_throws_exception(self):
         self.client.credentials(HTTP_AUTHORIZATION=self.token)
 
         data = {
@@ -53,7 +55,6 @@ class UsersTests(APITestCase):
         self.assertEqual(result['username'][0], 'This field must be unique.')
 
     def test_authentication_flow(self):
-
         self.client.post(reverse('sign-up'), data={
             "username": "ahmedsaleh",
             "password": "Test123456!!",
@@ -149,14 +150,13 @@ class UsersTests(APITestCase):
         }
 
         response = self.client.put(
-            reverse('users-detail', kwargs={'pk': 1}), data=data)
+            reverse('users-detail', kwargs={'pk': self.user.id}), data=data)
         result = response.json()
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(result['data']['avatar'], data['avatar'])
 
-    def test_update_other_avatar(self):
-
+    def test_update_other_avatar_throws_exception(self):
         self.client.post(reverse('sign-up'), data={
             "username": "ahmedsaleh",
             "password": "Test123456!!",
@@ -179,8 +179,7 @@ class UsersTests(APITestCase):
         self.assertEqual(
             result['detail'], 'You do not have permission to perform this action.')
 
-    def test_create_users_with_no_permission(self):
-
+    def test_create_users_with_no_permission_throws_exception(self):
         data = {
             "username": "fadezak100",
             "password": "Password123456!!",
@@ -196,7 +195,7 @@ class UsersTests(APITestCase):
         self.assertEqual(
             result['detail'], 'Authentication credentials were not provided.')
 
-    def test_validating_tokens(self):
+    def test_validate_token(self):
         self.client.credentials(HTTP_AUTHORIZATION=self.token)
 
         response = self.client.post(reverse('authenticate_token'))
@@ -205,7 +204,7 @@ class UsersTests(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(result['user']['username'], 'fadezak100')
 
-    def test_invalid_token(self):
+    def test_validate_token_throws_exception(self):
         token = 'Token 484f085d6c12b1ae2b27748d3ba5429d3a762904e1e15e3aa68a8a1eb0212a6d'
         self.client.credentials(HTTP_AUTHORIZATION=token)
 
