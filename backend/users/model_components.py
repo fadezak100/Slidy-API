@@ -3,7 +3,7 @@ from .models import User
 
 class UserCommonComponents:
 
-    def createUser(username, email, first_name, last_name, password):
+    def create_user(username, email, first_name, last_name, password):
         user = User.objects.create(
             username=username,
             email=email,

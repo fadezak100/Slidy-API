@@ -22,11 +22,9 @@ class UserViewSet(UserViewSetPermissionMixin, viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         query_params = request.GET.get('slides')
 
-        if query_params:
-            self.serializer_class = ViewsCommonComponents.check_include_slides_params(
+        if query_params is not None:
+            self.serializer_class = ViewsCommonComponents.assign_new_serializer(
                 query_params)
-        else:
-            self.serializer_class = UserSerializer
 
         return super().list(request, *args, **kwargs)
 
@@ -96,12 +94,11 @@ class LogInAPIView(KnoxLoginView):
 
     def get_post_response_data(self, request, token, instance):
         query_params = request.query_params.get('slides')
+        serializer = self.get_user_serializer_class()
 
         if query_params is not None:
-            serializer = ViewsCommonComponents.check_include_slides_params(
+            serializer = ViewsCommonComponents.assign_new_serializer(
                 query_params)
-        else:
-            serializer = self.get_user_serializer_class()
 
         query_set = User.objects.filter(username=request.user).values(
             'id', 'username', 'first_name', 'last_name', 'email', 'avatar', 'slides_info')[0]
@@ -122,28 +119,13 @@ class LogInAPIView(KnoxLoginView):
 
 @api_view(['POST'])
 def authenticate_token(request):
-    token = request.META.get('HTTP_AUTHORIZATION').split(
-    )[1] if 'HTTP_AUTHORIZATION' in request.META else None
+    user_info = ViewsCommonComponents.authenticate_token(request.META)
 
-    if not token:
-        return Response({'error': 'Token not provided'}, status=status.HTTP_400_BAD_REQUEST)
-
-    try:
-        token_payload = AuthToken.objects.get(token_key=token[:8])
-        username = str(token_payload).split(' ')[2]
-        query_set = User.objects.get(username=username)
-        user_info = UserSerializer(query_set).data
-        return Response({
-            "status_code": 200,
-            "message": "success",
-            "user": user_info
-        }, status=status.HTTP_200_OK)
-
-    except AuthToken.DoesNotExist:
-        return Response({
-            "status_code": 401,
-            "error": "invalid token"
-        }, status=status.HTTP_401_UNAUTHORIZED)
+    return Response({
+        "status_code": 200,
+        "message": "success",
+        "user": user_info
+    }, status=status.HTTP_200_OK)
 
 
 register_generic_view = RegisterUserAPIView.as_view()

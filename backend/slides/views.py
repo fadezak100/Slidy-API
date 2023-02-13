@@ -50,8 +50,6 @@ class SlideViewSet(UserViewSetPermissionMixin, viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        request.data.get('slide')
-
         slide_file = request.data.get('slide')
 
         if not request.data.get('title'):

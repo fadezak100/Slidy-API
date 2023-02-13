@@ -1,14 +1,14 @@
-django>=4.0.0,<4.1.0
+django
 django-dotenv
 djangorestframework
 django-cors-headers
 django-rest-knox
 PyYAML
 cloudinary
-requests==2.6.0
+requests
 uplink
 markdown
+cloudinary
 channels==3.0.5
 channels-radis
 psycopg2-binary
-pytest
