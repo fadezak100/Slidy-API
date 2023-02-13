@@ -1,4 +1,4 @@
-django
+django>=4.0.0,<4.1.0
 django-dotenv
 djangorestframework
 django-cors-headers
@@ -9,6 +9,7 @@ requests
 uplink
 markdown
 cloudinary
-channels
-channels_redis==2.0.0
+asgiref>=3.6.0
+channels==3.0.5
+channels_redis==4.0.0
 psycopg2-binary
