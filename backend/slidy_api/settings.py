@@ -96,11 +96,24 @@ CHANNEL_LAYERS = {
     
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
+DB_USERNAME= environment.DB_USER
+DB_PASSWORD= environment.DB_PASSWORD
+DB_HOST= environment.DB_HOST
+DB_PORT= environment.DB_PORT
+DB_DATABASE= environment.DB_DATABASE
+
+DB_IS_AVAIL = all([
+        DB_USERNAME, 
+        DB_PASSWORD, 
+        DB_HOST,
+        DB_PORT,
+        DB_DATABASE
+])
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': environment.DB_NAME,
+        'NAME': environment.DB_DATABASE,
         'USER': environment.DB_USER,
         'PASSWORD': environment.DB_PASSWORD,
         'HOST': environment.DB_HOST,

@@ -8,7 +8,7 @@ CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET')
 
 DEFAULT_AVATAR = os.environ.get('DEFAULT_AVATAR')
 
-DB_NAME = os.environ.get('POSTGRES_DB')
+DB_DATABASE = os.environ.get('POSTGRES_DB')
 
 DB_USER = os.environ.get('POSTGRES_USER')
 
