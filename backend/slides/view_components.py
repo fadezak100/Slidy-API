@@ -15,7 +15,7 @@ class SlideCommonComponents:
 
         slide_request = requests.get(slide_url)
 
-        if slide_request.status_code == 200:
+        if slide_request.status_code != 200:
             raise SlideRequestError(
                 f"Failed to retrieve slide content from URL: {slide_url}", 500)
 
