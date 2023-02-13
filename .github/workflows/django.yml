@@ -11,9 +11,9 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
-      MY_POSTGRES_USER: someuser
-      MY_POSTGRES_PASSWORD: somepassword
-      MY_POSTGRES_DB: somedbname
+      MY_POSTGRES_USER: "someuser"
+      MY_POSTGRES_PASSWORD: "somepassword"
+      MY_POSTGRES_DB: "somedbname"
     strategy:
       max-parallel: 4
       matrix:
