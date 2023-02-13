@@ -29,6 +29,7 @@ jobs:
       env:
         DEBUG: "0"
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        DEFAULT_AVATAR: ${{ secrets.DEFAULT_AVATAR }}
       run: |
         cd backend
         python manage.py test
