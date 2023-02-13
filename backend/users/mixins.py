@@ -1,6 +1,6 @@
 from rest_framework.permissions import IsAuthenticated
 
-from .permissions import IsStaffEditorPermission
+from .permissions import IsOwnerPermission
 
-class StaffEditorPermissionMixin():
-    permission_classes = [IsAuthenticated]
+class UserViewSetPermissionMixin:
+    permission_classes = [IsAuthenticated, IsOwnerPermission]
