@@ -10,10 +10,28 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+     env:
+      MY_POSTGRES_USER: someuser
+      MY_POSTGRES_PASSWORD: somepassword
+      MY_POSTGRES_DB: somedbname
     strategy:
       max-parallel: 4
       matrix:
         python-version: [3.7, 3.8, 3.9]
+    services:
+      postgres_main:
+        image: postgres:12
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 5
 
     steps:
     - uses: actions/checkout@v3
@@ -33,6 +51,12 @@ jobs:
         CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
         CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
         CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+        DB_USERNAME: ${{ secrets.POSTGRES_USER }}
+        DB_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        DB_HOST: ${{ secrets.POSTGRES_HOST }}
+        DB_DATABASE: ${{ secrets.POSTGRES_DB }}
+        DB_PORT: ${{ secrets.POSTGRES_PORT }}
+
       run: |
         cd backend
         python manage.py test

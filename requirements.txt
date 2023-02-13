@@ -9,6 +9,6 @@ requests
 uplink
 markdown
 cloudinary
-channels==3.0.5
+channels
 channels-radis
 psycopg2-binary
