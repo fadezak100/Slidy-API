@@ -10,5 +10,5 @@ uplink
 markdown
 cloudinary
 channels
-channels-radis
+channels_redis==2.0.0
 psycopg2-binary
