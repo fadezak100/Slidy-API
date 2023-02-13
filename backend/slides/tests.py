@@ -118,10 +118,11 @@ class SlidesTests(APITestCase):
         }
 
         response = self.client.post(reverse("slides-list"), data=data)
+        new_slide = response.json()
 
         self.client.credentials(HTTP_AUTHORIZATION=self.token)
         response = self.client.delete(
-            reverse("slides-detail", kwargs={'pk': 2}), data=data)
+            reverse("slides-detail", kwargs={'pk': new_slide['data']['id']}), data=data)
         result = response.json()
 
         self.assertEqual(response.status_code, 403)
@@ -161,6 +162,7 @@ class SlidesTests(APITestCase):
 
         response = self.client.get(reverse('slides-detail', kwargs={'pk': 4}))
         result = response.json()
+
 
         self.assertEqual(response.status_code, 404)
         self.assertIn(result['detail'], 'Not found.')
@@ -226,10 +228,10 @@ class SlidesTests(APITestCase):
             "is_public": False,
             "is_live": False
         }
-
+        
         self.client.credentials(HTTP_AUTHORIZATION=self.token)
         response = self.client.patch(
-            reverse("slides-detail", kwargs={'pk': new_slides['data']['user_data']['id']}), data=update_data)
+            reverse("slides-detail", kwargs={'pk': new_slides['data']['id']}), data=update_data)
 
         result = response.json()
 

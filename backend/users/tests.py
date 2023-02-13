@@ -1,4 +1,5 @@
 from rest_framework.test import APITestCase
+
 from .models import User
 from knox.models import AuthToken
 
@@ -156,14 +157,16 @@ class UsersTests(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(result['data']['avatar'], data['avatar'])
 
+
     def test_update_other_avatar_throws_exception(self):
-        self.client.post(reverse('sign-up'), data={
+        new_user_response = self.client.post(reverse('sign-up'), data={
             "username": "ahmedsaleh",
             "password": "Test123456!!",
             "email": "ahmedsaleh@gmail.com",
             "first_name": "Ahmed",
             "last_name": "Saleh"
         })
+        new_user = new_user_response.json()
 
         self.client.credentials(HTTP_AUTHORIZATION=self.token)
 
@@ -172,7 +175,7 @@ class UsersTests(APITestCase):
         }
 
         response = self.client.put(
-            reverse('users-detail', kwargs={'pk': 2}), data=data)
+            reverse('users-detail', kwargs={'pk': new_user['data']['id']}), data=data)
         result = response.json()
 
         self.assertEqual(response.status_code, 403)

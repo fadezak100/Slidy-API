@@ -77,10 +77,8 @@ class RegisterUserAPIView(generics.GenericAPIView):
         return Response({
             "status_code": 200,
             "message": "success",
-            "data": {
-                "user": self.get_serializer(user).data,
-                "token": AuthToken.objects.create(user)[1]
-            }
+            "data": UserSerializer(user).data,
+            "token": AuthToken.objects.create(user)[1],
         }, status=status.HTTP_200_OK)
 
 
