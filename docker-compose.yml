@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+    django:
+        build: .
+        container_name: django
+        command: python3 backend/manage.py runserver 0.0.0.0:8000
+        ports:
+            - "8000:8000"
+        
+        depends_on:
+            - pgdb
+    
+    pgdb:
+        image: postgres
+        container_name: postgres
+        environment:
+             POSTGRES_DB: postgres
+             POSTGRES_USER: postgres
+             POSTGRES_PASSWORD: postgres
